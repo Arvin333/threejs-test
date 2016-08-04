@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>My first Three.js app</title>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="js/three.min.js"></script>
+		<script>
+			// Our Javascript will go here.
+			var scene = new THREE.Scene(),
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000),
+				renderer = new THREE.WebGLRenderer(),
+				geometry = new THREE.BoxGeometry( 1, 1, 1 ),
+				vx = new THREE.Geometry(),
+				vy = new THREE.Geometry(),
+				vz = new THREE.Geometry(),
+				material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors}  ),
+				material2 = new THREE.MeshBasicMaterial( {
+					color: 0x00ff00
+				} ),
+				cube = new THREE.Mesh( geometry, material ),
+				rotation = cube.rotation,
+				position = camera.position,
+				isDown = false,
+				x,y,speedX=0,speedY=0;
+
+			geometry.faces.forEach(function  (item,index) {
+				var color
+				if(index%2===0){
+					color = Math.random()*0xffffff;
+					geometry.faces[index].color.setHex(color)
+					geometry.faces[index+1].color.setHex(color)
+				}
+			})
+
+			vx.vertices.push(
+				new THREE.Vector3( 0, 0, 0 ),
+				new THREE.Vector3( 5, -2, 0 )
+			);
+			vy.vertices.push(
+				new THREE.Vector3( 0, 0, 0 ),
+				new THREE.Vector3( 0, 5, 0 )
+			);
+			vz.vertices.push(
+				new THREE.Vector3( 0, 0, 0 ),
+				new THREE.Vector3( -2, -1, 5 )
+			);
+
+			var linex = new THREE.Line( vx, material2 );
+			var liney = new THREE.Line( vy, material2 );
+			var linez = new THREE.Line( vz, material2 );
+			scene.add( linex );
+			scene.add( liney );
+			scene.add( linez );
+			var that,c;
+			camera.position.z = 8;
+
+			var calculate = function  (e) {
+				if(that){
+					speedX= that.x-e.x;
+					speedY= that.y-e.y;
+					that = e;
+				}else {
+					that = e;
+				}
+			}
+			var mousedown = function  (e) {
+				speedX =0; 
+				isDown = true;
+			};
+			var mousemove = function  (e) {
+				if(isDown){
+					calculate(e);
+					if(rotation.x+1.57>0){
+						rotation.x -= speedY*0.005;
+					}else {
+						rotation.x=-1.6051998
+					}
+					if(rotation.x<1.57){
+						rotation.x -= speedY*0.005;
+					}else {
+						rotation.x=1.569
+					}
+
+					console.log(rotation.x)
+					rotation.y -= speedX*0.005;
+				}
+			};
+			var mouseup = function  (e) {
+				isDown = false;
+				that=undefined;
+			};
+			var mouseWheel = function  (e) {
+				if(e.wheelDelta<0&&position.z<20){
+					position.z+=0.3;
+				}else if(position.z>2){
+					position.z-=0.3
+				}
+			};
+
+			document.addEventListener("mousedown", mousedown);
+			document.addEventListener("mousemove", mousemove);
+			document.addEventListener("mouseup", mouseup);
+			document.addEventListener("mousewheel", mouseWheel);
+
+			renderer.setSize( window.innerWidth/1.003, window.innerHeight/1.003 );
+			renderer.setClearColor(0xffffff,0.8); 
+			scene.add( cube );
+			function render() {
+				// rotation.x = speedX;
+				// rotation.y = speedY;
+				requestAnimationFrame( render );
+				renderer.render( scene, camera );
+			}
+			render();
+			document.body.appendChild( renderer.domElement );
+		</script>
+	</body>
+</html>
